@@ -5,7 +5,7 @@ import { createHandler } from '../api/index.js';
 import { validCPF, validateCustomer, seal, unseal, normalizeStatus, retrySeconds, issuePix, checkPix, newOrder, PRODUCT } from '../lib/checkout.js';
 
 const env = { NEXUM_CHAT_ID: 'test-account', NEXUM_API_CREDENTIAL: 'test-credential', CHECKOUT_SESSION_SECRET: 'test-secret-only-not-for-production-123456789', WHATSAPP_URL: 'https://wa.me/5575988393742', NEXUM_ORIGIN: 'https://nexumpaybot.com' };
-const customer = { name: 'João da Conceição', email: 'test@example.com', emailConfirmation: 'test@example.com', document: '091.157.510-31' };
+const customer = { name: 'João da Conceição', email: 'test@example.com', emailConfirmation: 'test@example.com', document: '091.157.510-31', phone: '(75) 99999-9999' };
 const response = (data, status = 200, headers = {}) => new Response(JSON.stringify(data), { status, headers });
 const request = (path, { method = 'GET', cookie, body, origin = 'https://checkout.example.com' } = {}) => new Request(`https://checkout.example.com${path}`, { method, headers: { 'Content-Type': 'application/json', ...(origin ? { Origin: origin } : {}), ...(cookie ? { Cookie: cookie } : {}) }, body: body === undefined ? undefined : JSON.stringify(body) });
 const getCookie = result => result.headers.get('set-cookie').split(';')[0];
@@ -176,9 +176,17 @@ test('release deadline stays consistent in checkout config and paid receipt', as
   }
 });
 
-test('optional phone is validated and is never forwarded to the payment provider', () => {
-  assert.deepEqual(validateCustomer({ ...customer, phone: '(75) 99999-9999' }), validateCustomer(customer));
-  assert.throws(() => validateCustomer({ ...customer, phone: '12' }));
+test('phone with DDD is required and invalid submissions never reach the payment provider', async () => {
+  const handle = createHandler({ env, fetcher: async () => { assert.fail('invalid customer must not reach Nexum'); } });
+  for (const phone of [undefined, null, '', '   ', '12', '999999999', '(00) 99999-9999']) {
+    const result = await handle(request('/api/order', { method: 'POST', body: { ...customer, phone } }));
+    assert.equal(result.status, 400);
+    assert.equal((await result.json()).error, 'Informe um celular válido com DDD.');
+    assert.equal(result.headers.has('set-cookie'), false);
+  }
+  for (const phone of ['75999999999', '(75) 99999-9999', '(75) 3333-4444']) {
+    assert.deepEqual(validateCustomer({ ...customer, phone }), validateCustomer(customer));
+  }
 });
 
 test('cancelled, failed, expired and refunded payments never produce a receipt', async () => {

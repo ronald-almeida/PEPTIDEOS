@@ -51,7 +51,7 @@ node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
 
 Não há banco local: a Nexum mantém o registro financeiro e a sessão permite recuperar a cobrança no mesmo navegador por até sete dias. Em outro dispositivo, ou após apagar cookies, o suporte precisa localizar a compra na Nexum. A deduplicação em memória é uma proteção adicional por instância; não é um limitador distribuído contra clientes maliciosos. Antes de escalar tráfego, configure rate limiting na hospedagem.
 
-Esta implementação **não entrega o curso nem envia emails automaticamente**. A equipe deve liberar o acesso e enviar as orientações dentro do prazo anunciado. Não existe webhook de entrega cadastrado, pois não foi fornecido um sistema de alunos; o checkout confirma pelo endpoint de status documentado. O celular é opcional, não é armazenado e não é enviado à Nexum. A API documenta CPF; CNPJ não é solicitado.
+Esta implementação **não entrega o curso nem envia emails automaticamente**. A equipe deve liberar o acesso e enviar as orientações dentro do prazo anunciado. Não existe webhook de entrega cadastrado, pois não foi fornecido um sistema de alunos; o checkout confirma pelo endpoint de status documentado. O celular é obrigatório e validado com DDD; não é armazenado e não é enviado à Nexum, cuja documentação não define um campo de telefone na criação do Pix. A API documenta CPF; CNPJ não é solicitado.
 
 ## Verificação
 
