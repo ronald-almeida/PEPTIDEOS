@@ -154,11 +154,7 @@ async function init() {
     document.querySelectorAll('[data-price]').forEach(element => { element.textContent = money(config.product.amount); });
     document.querySelectorAll('[data-release]').forEach(element => { element.textContent = config.releaseHours === 2 ? 'em até 2 horas' : 'em até 2 dias'; });
     if (config.whatsappUrl) document.querySelectorAll('[data-support]').forEach(element => { element.href = config.whatsappUrl; });
-    if (!config.available) {
-      $('availability').textContent = 'O pagamento está temporariamente indisponível. Por favor, tente novamente mais tarde.';
-      $('availability').hidden = false;
-      return;
-    }
+    if (!config.available) return;
     const order = await api('/api/order');
     if (order.hasOrder) {
       showPanel();
