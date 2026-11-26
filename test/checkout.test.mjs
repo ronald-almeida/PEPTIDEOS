@@ -68,6 +68,26 @@ test('timeout can retry the original prepared order and never changes idempotenc
   assert.equal(keys[0], keys[1]);
 });
 
+test('non-JSON provider errors log only protocol metadata and preserve the order for recovery', async t => {
+  const log = t.mock.method(console, 'error', () => {});
+  const keys = [];
+  const handle = createHandler({ env, fetcher: async (url, options) => {
+    keys.push(options.headers['Idempotency-Key']);
+    if (keys.length === 1) return new Response('<html>private upstream details test-credential</html>', { status: 502, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+    return response({ ok: true, tx_id: 'recovered_tx', amount: 247, qr_code_text: 'TEST-NOT-A-PAYABLE-PIX' });
+  } });
+  const prepared = await handle(request('/api/order', { method: 'POST', body: customer }));
+  const failure = await handle(request('/api/pix', { method: 'POST', cookie: getCookie(prepared), body: {} }));
+  assert.equal(failure.status, 502);
+  assert.equal(failure.headers.get('retry-after'), '30');
+  assert.deepEqual(log.mock.calls[0].arguments, ['nexum_invalid_response', { operation: 'create_pix', status: 502, contentType: 'text/html' }]);
+  assert.equal(JSON.stringify(await failure.json()).includes('private upstream'), false);
+  const recovered = await handle(request('/api/pix', { method: 'POST', cookie: getCookie(failure), body: {} }));
+  assert.equal(recovered.status, 200);
+  assert.equal((await recovered.json()).txId, 'recovered_tx');
+  assert.equal(keys[0], keys[1]);
+});
+
 test('status polling enforces cooldown, confirms expected amount and deduplicates concurrent reads', async () => {
   let calls = 0;
   const order = { ...newOrder(validateCustomer(customer)), txId: randomUUID() };
