@@ -4,7 +4,7 @@ Checkout responsivo baseado na referência fornecida, sem cupom e com Pix como �
 
 - Produto: **COMBO BLACK REFERÊNCIA EM PEPTÍDEOS**.
 - Autor: Thiago Bechara dos Santos.
-- Preço: **R$ 10.000,00**, observado no checkout original em 26/11/2026; definido no servidor em `lib/checkout.js`.
+- Preço: **R$ 247,00**, atualizado conforme solicitado em 26/11/2026; definido no servidor em `lib/checkout.js`.
 - Prazo provisório: **até 2 dias**. `ACCESS_RELEASE_HOURS=2` troca para até 2 horas, tanto no checkout quanto no obrigado.
 - Suporte reutilizado da Black Visionária: https://wa.me/5575988393742.
 - Reembolso: https://reembolso-de-alunos.vercel.app/.

@@ -8,8 +8,8 @@ const env = { NEXUM_CHAT_ID: 'local-test', NEXUM_API_CREDENTIAL: 'local-test', C
 let status = 'PENDING';
 const sampleQr = (await readFile(new URL('./sample-qr.png', import.meta.url))).toString('base64');
 const handle = createHandler({ env, fetcher: async (url, options) => {
-  if (url.endsWith('/pix/create')) return Response.json({ ok: true, tx_id: 'local_test_transaction', amount: 10000, status: 'PENDING', qr_code_text: 'PREVIA LOCAL - NAO E PIX - NAO PAGAR', qr_code_base64: sampleQr, expires_in_seconds: 86400 });
-  return Response.json({ ok: true, tx_id: 'local_test_transaction', status, amount: 10000 });
+  if (url.endsWith('/pix/create')) return Response.json({ ok: true, tx_id: 'local_test_transaction', amount: 247, status: 'PENDING', qr_code_text: 'PREVIA LOCAL - NAO E PIX - NAO PAGAR', qr_code_base64: sampleQr, expires_in_seconds: 86400 });
+  return Response.json({ ok: true, tx_id: 'local_test_transaction', status, amount: 247 });
 } });
 const root = resolve('public');
 createServer(async (req, res) => {
