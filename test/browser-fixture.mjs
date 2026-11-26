@@ -15,6 +15,7 @@ const root = resolve('public');
 createServer(async (req, res) => {
   try {
     const url = new URL(req.url, `http://${req.headers.host}`);
+    if (url.pathname === '/fixture/reset') { status = 'PENDING'; res.writeHead(302, { 'Set-Cookie': 'peptideos_checkout=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0', Location: '/' }); res.end(); return; }
     if (url.pathname === '/fixture/paid') { status = 'PAID'; res.end('Local test now returns PAID.'); return; }
     if (url.pathname === '/fixture/pending') { status = 'PENDING'; res.end('Local test now returns PENDING.'); return; }
     if (url.pathname.startsWith('/api/')) {
